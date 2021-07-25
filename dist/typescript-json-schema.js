@@ -1298,7 +1298,7 @@ function exec(filePattern, fullTypeName, args) {
                         throw new Error("No output definition. Probably caused by errors prior to this?");
                     }
                     _b = (_a = JSON).stringify;
-                    return [4, $RefParser.bundle(stringify(definition))];
+                    return [4, $RefParser.bundle(JSON.parse(stringify(definition)))];
                 case 1:
                     json = _b.apply(_a, [_d.sent(), null, 2]);
                     if (args.out) {

@@ -1684,7 +1684,7 @@ export async function exec(filePattern: string, fullTypeName: string, args = get
     }
 
     // Deference all external references and remove circular dependencies.
-    const json = JSON.stringify(await $RefParser.bundle(stringify(definition)), null, 2)
+    const json = JSON.stringify(await $RefParser.bundle(JSON.parse(stringify(definition))), null, 2)
     if (args.out) {
         return new Promise((resolve, reject) => {
             const fs = require("fs");
