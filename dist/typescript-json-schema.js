@@ -53,6 +53,7 @@ var stringify = require("json-stable-stringify");
 var path = require("path");
 var crypto_1 = require("crypto");
 var ts = require("typescript");
+var $RefParser = require("@apidevtools/json-schema-ref-parser");
 var vm = require("vm");
 var REGEX_FILE_NAME_OR_SPACE = /(\bimport\(".*?"\)|".*?")\.| /g;
 var REGEX_TSCONFIG_NAME = /^.*\.json$/;
@@ -1272,52 +1273,58 @@ function normalizeFileName(fn) {
 function exec(filePattern, fullTypeName, args) {
     if (args === void 0) { args = getDefaultArgs(); }
     return __awaiter(this, void 0, void 0, function () {
-        var program, onlyIncludeFiles, globs, definition, json, hasBeenBuffered;
-        var _a;
-        return __generator(this, function (_b) {
-            onlyIncludeFiles = undefined;
-            if (REGEX_TSCONFIG_NAME.test(path.basename(filePattern))) {
-                if (args.include && args.include.length > 0) {
-                    globs = args.include.map(function (f) { return glob.sync(f); });
-                    onlyIncludeFiles = (_a = []).concat.apply(_a, globs).map(normalizeFileName);
-                }
-                program = programFromConfig(filePattern, onlyIncludeFiles);
-            }
-            else {
-                onlyIncludeFiles = glob.sync(filePattern);
-                program = getProgramFromFiles(onlyIncludeFiles, {
-                    strictNullChecks: args.strictNullChecks,
-                });
-                onlyIncludeFiles = onlyIncludeFiles.map(normalizeFileName);
-            }
-            definition = generateSchema(program, fullTypeName, args, onlyIncludeFiles);
-            if (definition === null) {
-                throw new Error("No output definition. Probably caused by errors prior to this?");
-            }
-            json = stringify(definition, { space: 4 }) + "\n\n";
-            if (args.out) {
-                return [2, new Promise(function (resolve, reject) {
-                        var fs = require("fs");
-                        fs.mkdir(path.dirname(args.out), { recursive: true }, function (mkErr) {
-                            if (mkErr) {
-                                return reject(new Error("Unable to create parent directory for output file: " + mkErr.message));
-                            }
-                            fs.writeFile(args.out, json, function (wrErr) {
-                                if (wrErr) {
-                                    return reject(new Error("Unable to write output file: " + wrErr.message));
-                                }
-                                resolve();
-                            });
+        var program, onlyIncludeFiles, globs, definition, json, _a, _b, hasBeenBuffered;
+        var _c;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
+                case 0:
+                    onlyIncludeFiles = undefined;
+                    if (REGEX_TSCONFIG_NAME.test(path.basename(filePattern))) {
+                        if (args.include && args.include.length > 0) {
+                            globs = args.include.map(function (f) { return glob.sync(f); });
+                            onlyIncludeFiles = (_c = []).concat.apply(_c, globs).map(normalizeFileName);
+                        }
+                        program = programFromConfig(filePattern, onlyIncludeFiles);
+                    }
+                    else {
+                        onlyIncludeFiles = glob.sync(filePattern);
+                        program = getProgramFromFiles(onlyIncludeFiles, {
+                            strictNullChecks: args.strictNullChecks,
                         });
-                    })];
+                        onlyIncludeFiles = onlyIncludeFiles.map(normalizeFileName);
+                    }
+                    definition = generateSchema(program, fullTypeName, args, onlyIncludeFiles);
+                    if (definition === null) {
+                        throw new Error("No output definition. Probably caused by errors prior to this?");
+                    }
+                    _b = (_a = JSON).stringify;
+                    return [4, $RefParser.bundle(stringify(definition))];
+                case 1:
+                    json = _b.apply(_a, [_d.sent(), null, 2]);
+                    if (args.out) {
+                        return [2, new Promise(function (resolve, reject) {
+                                var fs = require("fs");
+                                fs.mkdir(path.dirname(args.out), { recursive: true }, function (mkErr) {
+                                    if (mkErr) {
+                                        return reject(new Error("Unable to create parent directory for output file: " + mkErr.message));
+                                    }
+                                    fs.writeFile(args.out, json, function (wrErr) {
+                                        if (wrErr) {
+                                            return reject(new Error("Unable to write output file: " + wrErr.message));
+                                        }
+                                        resolve();
+                                    });
+                                });
+                            })];
+                    }
+                    else {
+                        hasBeenBuffered = process.stdout.write(json);
+                        if (hasBeenBuffered) {
+                            return [2, new Promise(function (resolve) { return process.stdout.on("drain", function () { return resolve(); }); })];
+                        }
+                    }
+                    return [2];
             }
-            else {
-                hasBeenBuffered = process.stdout.write(json);
-                if (hasBeenBuffered) {
-                    return [2, new Promise(function (resolve) { return process.stdout.on("drain", function () { return resolve(); }); })];
-                }
-            }
-            return [2];
         });
     });
 }

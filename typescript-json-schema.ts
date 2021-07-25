@@ -4,6 +4,7 @@ import * as path from "path";
 import { createHash } from "crypto";
 import * as ts from "typescript";
 import { JSONSchema7 } from "json-schema";
+import * as $RefParser from '@apidevtools/json-schema-ref-parser';
 export { Program, CompilerOptions, Symbol } from "typescript";
 
 const vm = require("vm");
@@ -1682,7 +1683,8 @@ export async function exec(filePattern: string, fullTypeName: string, args = get
         throw new Error("No output definition. Probably caused by errors prior to this?");
     }
 
-    const json = stringify(definition, { space: 4 }) + "\n\n";
+    // Deference all external references and remove circular dependencies.
+    const json = JSON.stringify(await $RefParser.bundle(stringify(definition)), null, 2)
     if (args.out) {
         return new Promise((resolve, reject) => {
             const fs = require("fs");
