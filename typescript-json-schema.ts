@@ -664,7 +664,7 @@ export class JsonSchemaGenerator {
                     if (
                         propertyType.flags & ts.TypeFlags.Object &&
                         (propertyType as ts.ObjectType).objectFlags &
-                            (ts.ObjectFlags.Anonymous | ts.ObjectFlags.Interface | ts.ObjectFlags.Mapped)
+                        (ts.ObjectFlags.Anonymous | ts.ObjectFlags.Interface | ts.ObjectFlags.Mapped)
                     ) {
                         definition.type = "object";
                         definition.additionalProperties = false;
@@ -1415,15 +1415,20 @@ export class JsonSchemaGenerator {
         }
 
         for (const symbolName of symbolNames) {
-            root.definitions[symbolName] = this.getTypeDefinition(
-                this.allSymbols[symbolName],
-                this.args.topRef,
-                undefined,
-                undefined,
-                undefined,
-                this.userSymbols[symbolName]
-            );
+            try {
+                root.definitions[symbolName] = this.getTypeDefinition(
+                    this.allSymbols[symbolName],
+                    this.args.topRef,
+                    undefined,
+                    undefined,
+                    undefined,
+                    this.userSymbols[symbolName]
+                );
+            } catch (err) {
+                console.log('Failed to generate for symbol, skipped', symbolName);
+            }
         }
+
         if (this.args.ref && includeReffedDefinitions && Object.keys(this.reffedDefinitions).length > 0) {
             root.definitions = { ...root.definitions, ...this.reffedDefinitions };
         }
