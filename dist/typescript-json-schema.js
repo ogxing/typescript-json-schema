@@ -47,7 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.exec = exports.programFromConfig = exports.generateSchema = exports.buildGenerator = exports.getProgramFromFiles = exports.JsonSchemaGenerator = exports.regexRequire = exports.getDefaultArgs = void 0;
+exports.exec = exports.programFromConfig = exports.generateSchema = exports.buildGenerator = exports.generatorMetric = exports.getProgramFromFiles = exports.JsonSchemaGenerator = exports.regexRequire = exports.getDefaultArgs = void 0;
 var glob = require("glob");
 var stringify = require("json-stable-stringify");
 var path = require("path");
@@ -1142,6 +1142,7 @@ exports.getProgramFromFiles = getProgramFromFiles;
 function generateHashOfNode(node, relativePath) {
     return crypto_1.createHash("md5").update(relativePath).update(node.pos.toString()).digest("hex").substring(0, 8);
 }
+exports.generatorMetric = [];
 function buildGenerator(program, args, onlyIncludeFiles) {
     if (args === void 0) { args = {}; }
     function isUserFile(file) {
@@ -1171,6 +1172,7 @@ function buildGenerator(program, args, onlyIncludeFiles) {
         var inheritingTypes_1 = {};
         var workingDir_1 = program.getCurrentDirectory();
         program.getSourceFiles().forEach(function (sourceFile, _sourceFileIdx) {
+            var startTime = Date.now();
             var relativePath = path.relative(workingDir_1, sourceFile.fileName);
             function inspect(node, tc) {
                 if (node.kind === ts.SyntaxKind.ClassDeclaration ||
@@ -1203,6 +1205,7 @@ function buildGenerator(program, args, onlyIncludeFiles) {
                 }
             }
             inspect(sourceFile, typeChecker_1);
+            exports.generatorMetric.push({ fileName: sourceFile.fileName, time: Date.now() - startTime });
         });
         return new JsonSchemaGenerator(symbols_1, allSymbols_1, userSymbols_1, inheritingTypes_1, typeChecker_1, settings);
     }

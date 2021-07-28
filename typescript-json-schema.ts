@@ -1500,6 +1500,7 @@ function generateHashOfNode(node: ts.Node, relativePath: string): string {
     return createHash("md5").update(relativePath).update(node.pos.toString()).digest("hex").substring(0, 8);
 }
 
+export const generatorMetric: {fileName: string, time: Number}[] = [];
 export function buildGenerator(
     program: ts.Program,
     args: PartialArgs = {},
@@ -1540,6 +1541,7 @@ export function buildGenerator(
         const workingDir = program.getCurrentDirectory();
 
         program.getSourceFiles().forEach((sourceFile, _sourceFileIdx) => {
+            const startTime = Date.now();
             const relativePath = path.relative(workingDir, sourceFile.fileName);
 
             function inspect(node: ts.Node, tc: ts.TypeChecker) {
@@ -1578,6 +1580,7 @@ export function buildGenerator(
                 }
             }
             inspect(sourceFile, typeChecker);
+            generatorMetric.push({fileName: sourceFile.fileName, time: Date.now() - startTime});
         });
 
         return new JsonSchemaGenerator(symbols, allSymbols, userSymbols, inheritingTypes, typeChecker, settings);

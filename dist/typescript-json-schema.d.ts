@@ -111,6 +111,10 @@ export declare class JsonSchemaGenerator {
     getMainFileSymbols(program: ts.Program, onlyIncludeFiles?: string[]): string[];
 }
 export declare function getProgramFromFiles(files: string[], jsonCompilerOptions?: any, basePath?: string): ts.Program;
+export declare const generatorMetric: {
+    fileName: string;
+    time: Number;
+}[];
 export declare function buildGenerator(program: ts.Program, args?: PartialArgs, onlyIncludeFiles?: string[]): JsonSchemaGenerator | null;
 export declare function generateSchema(program: ts.Program, fullTypeName: string, args?: PartialArgs, onlyIncludeFiles?: string[], externalGenerator?: JsonSchemaGenerator): Definition | null;
 export declare function programFromConfig(configFileName: string, onlyIncludeFiles?: string[]): ts.Program;
