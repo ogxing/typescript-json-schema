@@ -944,7 +944,7 @@ var JsonSchemaGenerator = (function () {
         }
         if (asRef) {
             returnedDefinition = {
-                $ref: this.args.id + "#/components/schemas/" + fullTypeName,
+                $ref: this.args.id + "#/definitions/" + fullTypeName,
             };
         }
         var otherAnnotations = {};
@@ -1031,7 +1031,7 @@ var JsonSchemaGenerator = (function () {
                     }
                     return acc;
                 }, {});
-                returnedDefinition = __assign({ $ref: this.args.id + "#/components/schemas/" + fullTypeName }, annotations);
+                returnedDefinition = __assign({ $ref: this.args.id + "#/definitions/" + fullTypeName }, annotations);
             }
         }
         if (otherAnnotations["nullable"]) {
